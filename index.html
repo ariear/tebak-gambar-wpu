@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.10.5/dist/cdn.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+</head>
+<body>
+  <div 
+    class="container mx-auto" 
+    x-data="game()" >
+    <h1 class="text-6xl text-center font-bold my-5 bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text text-transparent" x-text="title" @click="title = 'Tombol diklik njir'" ></h1>
+
+    <div class="grid grid-cols-4 gap-5">
+        <template x-for="card in cards" >
+            <div>
+                <div 
+                    class="h-[250px] rounded-lg cursor-pointer hover:scale-95 transition-all duration-500" :class="['bg-' + (card.flipped ? card.color : 'gray') + '-400' , card.animate]"
+                    @click="flipCard(card)"
+                    x-show="!card.cleared"
+                ></div>
+            </div>
+        </template>
+    </div>
+  </div>
+
+  <script>
+    const delay = (milliseconds = 700) => new Promise((resolve) => setTimeout(resolve, milliseconds))
+    const game = () => {
+        return {
+            title: 'Tebak Warna Sederhana',
+        cards: [
+            { color: 'red', flipped: false , cleared: false, animate: '' },
+            { color: 'green', flipped: false , cleared: false, animate: '' },
+            { color: 'blue', flipped: false , cleared: false, animate: '' },
+            { color: 'yellow', flipped: false , cleared: false, animate: '' },
+            { color: 'red', flipped: false , cleared: false, animate: '' },
+            { color: 'green', flipped: false , cleared: false, animate: '' },
+            { color: 'blue', flipped: false , cleared: false, animate: '' },
+            { color: 'yellow', flipped: false , cleared: false, animate: '' },
+        ].sort(() => Math.random() - 0.5),
+        get flippedCards() {
+            return this.cards.filter((card) => card.flipped)
+        },
+        get remainingCards(){
+            return this.cards.filter((card) => !card.cleared)
+        },
+        async flipCard(card){
+            if (this.flippedCards.length === 2) return false
+
+            card.flipped = !card.flipped
+            
+            if(this.flippedCards.length === 2){
+                if(this.flippedCards[0].color === this.flippedCards[1].color ){
+                    this.flippedCards.forEach((card) => card.animate = 'animate__animated animate__rubberBand')
+                    
+                    await delay()
+                    this.flippedCards.forEach((card) => card.cleared = true)
+
+                    if(this.remainingCards.length === 0){
+                        alert('Kamu menang njir')
+                        location.reload()
+                    }
+                }
+
+                this.flippedCards.forEach((card) => card.animate = 'animate__animated animate__shakeX')
+                
+                await delay()
+                this.flippedCards.forEach((card) => card.flipped = false)
+                this.remainingCards.forEach((card) => card.animate = '')
+            }
+        }
+        }
+    }
+  </script>
+</body>
+</html>
